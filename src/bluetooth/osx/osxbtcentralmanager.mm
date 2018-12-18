@@ -1032,6 +1032,9 @@ QT_END_NAMESPACE
 {
     using namespace OSXBluetooth;
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunguarded-availability-new"
+
     const auto state = central.state;
 #if QT_IOS_PLATFORM_SDK_EQUAL_OR_ABOVE(__IPHONE_10_0) || QT_OSX_PLATFORM_SDK_EQUAL_OR_ABOVE(__MAC_10_13)
     if (state == CBManagerStateUnknown
@@ -1101,6 +1104,8 @@ QT_END_NAMESPACE
         // We actually handled all known states, but .. Core Bluetooth can change?
         Q_ASSERT_X(0, Q_FUNC_INFO, "invalid centra's state");
     }
+
+#pragma clang diagnostic pop
 }
 
 - (void)centralManager:(CBCentralManager *)central didConnectPeripheral:(CBPeripheral *)aPeripheral
@@ -1150,6 +1155,8 @@ QT_END_NAMESPACE
         qCWarning(QT_BT_OSX) << "failed to disconnect";
         if (notifier)
             emit notifier->CBManagerError(QLowEnergyController::UnknownRemoteDeviceError);
+        if (notifier)
+            emit notifier->disconnected();
     } else {
         managerState = OSXBluetooth::CentralManagerIdle;
         if (notifier)
